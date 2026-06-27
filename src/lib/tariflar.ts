@@ -14,19 +14,19 @@ export const TARIFLAR: Record<Tarif, TarifMalumot> = {
   boshlangich: {
     nomi: 'Boshlang\'ich',
     limit: 20,
-    narx: 50000,
+    narx: 150000,
     imkoniyatlar: ['20 tagacha e\'lon', 'Qidiruvda ko\'rinish'],
   },
   standart: {
     nomi: 'Standart',
     limit: 50,
-    narx: 100000,
+    narx: 300000,
     imkoniyatlar: ['50 tagacha e\'lon', 'Qidiruvda ko\'rinish'],
   },
   premium: {
     nomi: 'Premium',
     limit: null,
-    narx: 200000,
+    narx: 600000,
     imkoniyatlar: ['Cheksiz e\'lon', 'Qidiruvda ko\'rinish'],
   },
 }

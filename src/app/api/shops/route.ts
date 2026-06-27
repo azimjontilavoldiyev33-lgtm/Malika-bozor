@@ -25,7 +25,14 @@ export async function GET(request: NextRequest) {
     }
 
     const shops = await Shop.find(filter).sort({ createdAt: -1 }).lean()
-    return NextResponse.json({ shops })
+    // Faqat ommaviy ro'yxatni keshlaymiz (admin filtri keshlanmaydi)
+    const headers = holatiParam
+      ? undefined
+      : {
+          'Cache-Control':
+            'public, s-maxage=60, stale-while-revalidate=120',
+        }
+    return NextResponse.json({ shops }, { headers })
   } catch (e) {
     console.error('shops GET xato:', e)
     return NextResponse.json({ xato: 'Server xatosi' }, { status: 500 })

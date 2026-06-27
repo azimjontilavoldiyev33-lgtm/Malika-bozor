@@ -66,13 +66,21 @@ export async function GET(request: NextRequest) {
     ])
 
     const narxlar = natijalar.map((n) => n.narx)
-    return NextResponse.json({
-      model,
-      soni: natijalar.length,
-      engArzon: narxlar.length ? Math.min(...narxlar) : null,
-      engQimmat: narxlar.length ? Math.max(...narxlar) : null,
-      natijalar,
-    })
+    return NextResponse.json(
+      {
+        model,
+        soni: natijalar.length,
+        engArzon: narxlar.length ? Math.min(...narxlar) : null,
+        engQimmat: narxlar.length ? Math.max(...narxlar) : null,
+        natijalar,
+      },
+      {
+        headers: {
+          'Cache-Control':
+            'public, s-maxage=30, stale-while-revalidate=60',
+        },
+      },
+    )
   } catch (e) {
     console.error('models GET xato:', e)
     return NextResponse.json({ xato: 'Server xatosi' }, { status: 500 })

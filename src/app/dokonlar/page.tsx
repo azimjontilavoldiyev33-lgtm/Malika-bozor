@@ -3,7 +3,7 @@ import { dbConnect } from '@/lib/db'
 import { Shop } from '@/models/Shop'
 import { joylashuvMatn } from '@/lib/format'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 60 // 60s keshlash (tezlik uchun)
 
 export default async function DokonlarPage() {
   await dbConnect()

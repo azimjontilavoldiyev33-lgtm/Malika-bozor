@@ -14,7 +14,7 @@ import {
 } from '@/lib/format'
 import type { ListingNatija } from '@/lib/types'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 60 // 60s keshlash (tezlik uchun)
 
 export default async function DokonPage({
   params,

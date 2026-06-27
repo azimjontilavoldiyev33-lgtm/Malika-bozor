@@ -98,12 +98,21 @@ export async function GET(request: NextRequest) {
     const natijalar = res?.natijalar ?? []
     const jami = res?.jami?.[0]?.soni ?? 0
 
-    return NextResponse.json({
-      natijalar,
-      jami,
-      page,
-      sahifalar: Math.ceil(jami / limit),
-    })
+    return NextResponse.json(
+      {
+        natijalar,
+        jami,
+        page,
+        sahifalar: Math.ceil(jami / limit),
+      },
+      {
+        // Vercel CDN'da 30s keshlanadi, 60s davomida eski natija ko'rsatib yangilanadi
+        headers: {
+          'Cache-Control':
+            'public, s-maxage=30, stale-while-revalidate=60',
+        },
+      },
+    )
   } catch (e) {
     console.error('listings GET xato:', e)
     return NextResponse.json({ xato: 'Server xatosi' }, { status: 500 })
