@@ -1,8 +1,12 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next'
+import path from 'node:path'
 
 const nextConfig: NextConfig = {
-  /* config options here */
   reactCompiler: true,
-};
+  // Bir nechta lockfile ogohlantirishini bartaraf etamiz — ildizni aniq belgilaymiz
+  turbopack: {
+    root: path.join(__dirname),
+  },
+}
 
-export default nextConfig;
+export default nextConfig
