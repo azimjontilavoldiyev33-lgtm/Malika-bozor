@@ -1,4 +1,5 @@
 import { Schema, model, models, type Types, type Model } from 'mongoose'
+import type { Tarif } from '@/lib/tariflar'
 
 export type ShopStatus = 'kutilmoqda' | 'tasdiqlangan' | 'bloklangan'
 
@@ -24,6 +25,7 @@ export interface IShop {
   // Obuna: shu sanagacha do'kon e'lonlari mijozga ko'rinadi.
   // null yoki o'tib ketgan bo'lsa — e'lonlar yashirin (obuna kerak).
   obunaTugashi: Date | null
+  tarif: Tarif // e'lon limitini belgilaydi
   reyting: number
   createdAt: Date
   updatedAt: Date
@@ -57,6 +59,11 @@ const ShopSchema = new Schema<IShop>(
       index: true,
     },
     obunaTugashi: { type: Date, default: null, index: true },
+    tarif: {
+      type: String,
+      enum: ['boshlangich', 'standart', 'premium'],
+      default: 'boshlangich',
+    },
     reyting: { type: Number, default: 0, min: 0, max: 5 },
   },
   { timestamps: true },

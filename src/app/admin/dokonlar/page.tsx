@@ -4,6 +4,7 @@ import { joylashuvMatn } from '@/lib/format'
 import DokonHolat from '@/components/DokonHolat'
 import ObunaBoshqaruv from '@/components/ObunaBoshqaruv'
 import type { ShopStatus } from '@/models/Shop'
+import type { Tarif } from '@/lib/tariflar'
 
 const HOLAT: Record<ShopStatus, { matn: string; rang: string }> = {
   kutilmoqda: { matn: 'Kutilmoqda', rang: 'bg-amber-100 text-amber-700' },
@@ -17,6 +18,7 @@ interface AdminShop {
   telefon?: string
   holati: ShopStatus
   obunaTugashi: string | null
+  tarif: Tarif
   joylashuv?: { blok?: string; qator?: string; dokonRaqami?: string }
 }
 
@@ -60,7 +62,11 @@ export default async function AdminDokonlar() {
               <DokonHolat shopId={s._id} holati={s.holati} />
             </div>
             <div className="mt-2">
-              <ObunaBoshqaruv shopId={s._id} obunaTugashi={s.obunaTugashi} />
+              <ObunaBoshqaruv
+                shopId={s._id}
+                obunaTugashi={s.obunaTugashi}
+                tarif={s.tarif}
+              />
             </div>
           </div>
         ))}

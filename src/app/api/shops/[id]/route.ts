@@ -4,6 +4,7 @@ import { Shop } from '@/models/Shop'
 import { Listing } from '@/models/Listing'
 import { shopSchema } from '@/lib/validators'
 import { getCurrentUser } from '@/lib/auth'
+import { TARIF_RUYXATI } from '@/lib/tariflar'
 import { z } from 'zod'
 
 // GET /api/shops/[id] — do'kon + faol e'lonlari (ommaviy)
@@ -62,6 +63,16 @@ export async function PATCH(
         return NextResponse.json({ xato: 'Holat noto\'g\'ri' }, { status: 400 })
       }
       shop.holati = parsed.data.holati
+      await shop.save()
+      return NextResponse.json({ ok: true, shop })
+    }
+
+    // Admin tarifni o'zgartirishi: { tarif: 'boshlangich' | 'standart' | 'premium' }
+    if (user.rol === 'admin' && 'tarif' in body) {
+      if (!TARIF_RUYXATI.includes(body.tarif)) {
+        return NextResponse.json({ xato: 'Tarif noto\'g\'ri' }, { status: 400 })
+      }
+      shop.tarif = body.tarif
       await shop.save()
       return NextResponse.json({ ok: true, shop })
     }

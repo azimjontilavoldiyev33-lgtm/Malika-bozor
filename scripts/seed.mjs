@@ -37,6 +37,7 @@ const Shop = mongoose.model(
       ishVaqti: String,
       holati: { type: String, default: 'tasdiqlangan' },
       obunaTugashi: { type: Date, default: null },
+      tarif: { type: String, default: 'boshlangich' },
       reyting: { type: Number, default: 0 },
     },
     { timestamps: true },
@@ -156,6 +157,7 @@ async function main() {
       ishVaqti: '09:00 - 19:00',
       holati: 'tasdiqlangan',
       obunaTugashi: obuna,
+      tarif: ['boshlangich', 'standart', 'premium', 'standart'][i] ?? 'boshlangich',
       reyting: 4 + Math.random(),
     })
     user.shopId = shop._id

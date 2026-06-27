@@ -4,6 +4,7 @@ import { dbConnect } from '@/lib/db'
 import { Shop } from '@/models/Shop'
 import { Listing } from '@/models/Listing'
 import { joylashuvMatn, obunaFaolmi, obunaKunlari, sanaFormat } from '@/lib/format'
+import { tarifNomi, limitMatn, elonLimiti } from '@/lib/tariflar'
 
 const HOLAT_BELGI: Record<string, { matn: string; rang: string }> = {
   kutilmoqda: {
@@ -30,6 +31,7 @@ export default async function KabinetBosh() {
     : null
   const obunaFaol = obunaFaolmi(obunaTugashi)
   const obunaKun = obunaKunlari(obunaTugashi)
+  const limit = elonLimiti(shop?.tarif)
 
   return (
     <div className="space-y-4">
@@ -101,6 +103,34 @@ export default async function KabinetBosh() {
         <p className="mt-1 text-sm text-slate-500">
           📍 {joylashuvMatn(shop?.joylashuv)}
         </p>
+      </div>
+
+      {/* Tarif + limit */}
+      <div className="rounded-2xl border border-slate-200 bg-white p-4">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium text-slate-600">
+            Tarif: <b className="text-slate-900">{tarifNomi(shop?.tarif)}</b>
+          </span>
+          <span className="text-sm text-slate-500">
+            {elonlarSoni}/{limitMatn(shop?.tarif)} e&apos;lon
+          </span>
+        </div>
+        {limit !== null && (
+          <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
+            <div
+              className={`h-full rounded-full ${
+                elonlarSoni >= limit ? 'bg-red-500' : 'bg-indigo-500'
+              }`}
+              style={{ width: `${Math.min(100, (elonlarSoni / limit) * 100)}%` }}
+            />
+          </div>
+        )}
+        {limit !== null && elonlarSoni >= limit && (
+          <p className="mt-2 text-xs text-red-600">
+            ⚠️ Limit tugadi. Yangi e&apos;lon uchun admindan tarifni oshirishni
+            so&apos;rang.
+          </p>
+        )}
       </div>
 
       {/* Statistika */}

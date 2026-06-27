@@ -5,6 +5,7 @@ import { Listing } from '@/models/Listing'
 import { Shop } from '@/models/Shop'
 import { listingSchema } from '@/lib/validators'
 import { getCurrentUser } from '@/lib/auth'
+import { limitTugaganmi, limitMatn } from '@/lib/tariflar'
 
 // GET /api/listings — qidiruv + filtr + saralash (ommaviy)
 export async function GET(request: NextRequest) {
@@ -127,6 +128,19 @@ export async function POST(request: NextRequest) {
     }
 
     await dbConnect()
+
+    // Tarif limitini tekshiramiz
+    const shop = await Shop.findById(user.shopId).lean()
+    const soni = await Listing.countDocuments({ shopId: user.shopId })
+    if (limitTugaganmi(shop?.tarif, soni)) {
+      return NextResponse.json(
+        {
+          xato: `E'lon limiti tugadi (${limitMatn(shop?.tarif)}). Tarifni oshiring.`,
+        },
+        { status: 403 },
+      )
+    }
+
     const listing = await Listing.create({
       ...parsed.data,
       shopId: user.shopId,

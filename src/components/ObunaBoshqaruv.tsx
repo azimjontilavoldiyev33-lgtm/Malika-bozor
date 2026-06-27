@@ -3,13 +3,21 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { obunaFaolmi, obunaKunlari, sanaFormat } from '@/lib/format'
+import {
+  TARIF_RUYXATI,
+  TARIFLAR,
+  limitMatn,
+  type Tarif,
+} from '@/lib/tariflar'
 
 export default function ObunaBoshqaruv({
   shopId,
   obunaTugashi,
+  tarif,
 }: {
   shopId: string
   obunaTugashi: string | null
+  tarif: Tarif
 }) {
   const router = useRouter()
   const [yuklanmoqda, setYuklanmoqda] = useState(false)
@@ -17,19 +25,38 @@ export default function ObunaBoshqaruv({
   const faol = obunaFaolmi(obunaTugashi)
   const kun = obunaKunlari(obunaTugashi)
 
-  async function uzaytir(oy: number) {
+  async function yubor(body: Record<string, unknown>) {
     setYuklanmoqda(true)
     const res = await fetch(`/api/shops/${shopId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ obunaOy: oy }),
+      body: JSON.stringify(body),
     })
     setYuklanmoqda(false)
     if (res.ok) router.refresh()
   }
 
+  const uzaytir = (oy: number) => yubor({ obunaOy: oy })
+
   return (
     <div className="rounded-xl bg-slate-50 p-3">
+      {/* Tarif tanlash */}
+      <div className="mb-2 flex items-center gap-2">
+        <span className="text-xs font-medium text-slate-600">Tarif:</span>
+        <select
+          value={tarif}
+          disabled={yuklanmoqda}
+          onChange={(e) => yubor({ tarif: e.target.value })}
+          className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs"
+        >
+          {TARIF_RUYXATI.map((t) => (
+            <option key={t} value={t}>
+              {TARIFLAR[t].nomi} ({limitMatn(t)})
+            </option>
+          ))}
+        </select>
+      </div>
+
       <div className="flex items-center justify-between">
         <span className="text-xs font-medium text-slate-600">Obuna</span>
         {faol ? (
