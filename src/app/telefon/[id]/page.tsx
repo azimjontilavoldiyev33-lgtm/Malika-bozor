@@ -41,7 +41,12 @@ export default async function TelefonPage({
       },
     },
     { $unwind: '$dokon' },
-    { $match: { 'dokon.holati': 'tasdiqlangan' } },
+    {
+      $match: {
+        'dokon.holati': 'tasdiqlangan',
+        'dokon.obunaTugashi': { $gt: new Date() },
+      },
+    },
     { $sort: { narx: 1 } },
   ])) as unknown as ListingNatija[]
 

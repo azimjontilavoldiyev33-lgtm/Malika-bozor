@@ -3,7 +3,7 @@ import { getCurrentUser } from '@/lib/auth'
 import { dbConnect } from '@/lib/db'
 import { Shop } from '@/models/Shop'
 import { Listing } from '@/models/Listing'
-import { joylashuvMatn } from '@/lib/format'
+import { joylashuvMatn, obunaFaolmi, obunaKunlari, sanaFormat } from '@/lib/format'
 
 const HOLAT_BELGI: Record<string, { matn: string; rang: string }> = {
   kutilmoqda: {
@@ -25,9 +25,47 @@ export default async function KabinetBosh() {
   })
 
   const holat = HOLAT_BELGI[shop?.holati ?? 'kutilmoqda']
+  const obunaTugashi = shop?.obunaTugashi
+    ? new Date(shop.obunaTugashi).toISOString()
+    : null
+  const obunaFaol = obunaFaolmi(obunaTugashi)
+  const obunaKun = obunaKunlari(obunaTugashi)
 
   return (
     <div className="space-y-4">
+      {/* Obuna banneri */}
+      <div
+        className={`rounded-2xl border p-4 ${
+          obunaFaol
+            ? obunaKun <= 5
+              ? 'border-amber-200 bg-amber-50'
+              : 'border-emerald-200 bg-emerald-50'
+            : 'border-red-200 bg-red-50'
+        }`}
+      >
+        {obunaFaol ? (
+          <>
+            <p className="font-medium">
+              {obunaKun <= 5 ? '⚠️ Obuna tugayapti' : '✅ Obuna faol'}
+            </p>
+            <p className="mt-1 text-sm text-slate-600">
+              {sanaFormat(obunaTugashi)} gacha ({obunaKun} kun qoldi). E&apos;lonlaringiz
+              mijozlarga ko&apos;rinib turibdi.
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="font-medium">
+              ⛔ Obuna {obunaTugashi ? 'muddati tugagan' : 'faollashtirilmagan'}
+            </p>
+            <p className="mt-1 text-sm text-slate-600">
+              Hozir e&apos;lonlaringiz mijozlarga <b>ko&apos;rinmaydi</b>. Obunani
+              faollashtirish uchun admin bilan bog&apos;laning.
+            </p>
+          </>
+        )}
+      </div>
+
       {/* Holat banneri */}
       {shop?.holati !== 'tasdiqlangan' && (
         <div

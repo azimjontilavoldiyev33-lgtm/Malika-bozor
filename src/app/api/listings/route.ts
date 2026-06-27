@@ -44,8 +44,11 @@ export async function GET(request: NextRequest) {
           ? { narx: -1 }
           : { createdAt: -1 }
 
-    // 2-bosqich: faqat tasdiqlangan do'konlar
-    const shopMatch: Record<string, unknown> = { 'dokon.holati': 'tasdiqlangan' }
+    // 2-bosqich: faqat tasdiqlangan VA obunasi faol do'konlar
+    const shopMatch: Record<string, unknown> = {
+      'dokon.holati': 'tasdiqlangan',
+      'dokon.obunaTugashi': { $gt: new Date() },
+    }
     if (blok) shopMatch['dokon.joylashuv.blok'] = blok
 
     const pipeline: mongoose.PipelineStage[] = [

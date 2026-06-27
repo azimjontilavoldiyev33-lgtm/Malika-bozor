@@ -10,6 +10,7 @@ import {
   yandexNavigator,
   googleNavigator,
   xaritaEmbed,
+  obunaFaolmi,
 } from '@/lib/format'
 import type { ListingNatija } from '@/lib/types'
 
@@ -25,7 +26,12 @@ export default async function DokonPage({
 
   await dbConnect()
   const shopDoc = await Shop.findById(id).lean()
-  if (!shopDoc || shopDoc.holati !== 'tasdiqlangan') notFound()
+  if (
+    !shopDoc ||
+    shopDoc.holati !== 'tasdiqlangan' ||
+    !obunaFaolmi(shopDoc.obunaTugashi)
+  )
+    notFound()
   const shop = JSON.parse(JSON.stringify(shopDoc))
 
   const elonlarDoc = await Listing.find({ shopId: id, faol: true })

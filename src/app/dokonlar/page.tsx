@@ -7,7 +7,10 @@ export const dynamic = 'force-dynamic'
 
 export default async function DokonlarPage() {
   await dbConnect()
-  const shopsDoc = await Shop.find({ holati: 'tasdiqlangan' })
+  const shopsDoc = await Shop.find({
+    holati: 'tasdiqlangan',
+    obunaTugashi: { $gt: new Date() },
+  })
     .sort({ createdAt: -1 })
     .lean()
   const shops = JSON.parse(JSON.stringify(shopsDoc))

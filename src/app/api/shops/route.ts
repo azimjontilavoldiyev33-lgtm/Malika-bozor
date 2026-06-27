@@ -19,7 +19,9 @@ export async function GET(request: NextRequest) {
       }
       filter.holati = holatiParam
     } else {
+      // Ommaviy: faqat tasdiqlangan va obunasi faol do'konlar
       filter.holati = 'tasdiqlangan'
+      filter.obunaTugashi = { $gt: new Date() }
     }
 
     const shops = await Shop.find(filter).sort({ createdAt: -1 }).lean()

@@ -66,6 +66,27 @@ export async function PATCH(
       return NextResponse.json({ ok: true, shop })
     }
 
+    // Admin obunani uzaytirishi: { obunaOy: 1 | 3 | 12 }
+    // Mavjud muddatga (yoki hozirdan) qo'shiladi. obunaOy: 0 — bekor qiladi.
+    if (user.rol === 'admin' && 'obunaOy' in body) {
+      const oy = Number(body.obunaOy)
+      if (oy === 0) {
+        shop.obunaTugashi = null
+      } else if (oy > 0) {
+        const hozir = Date.now()
+        const joriy = shop.obunaTugashi
+          ? new Date(shop.obunaTugashi).getTime()
+          : 0
+        const boshlanish = new Date(Math.max(hozir, joriy))
+        boshlanish.setMonth(boshlanish.getMonth() + oy)
+        shop.obunaTugashi = boshlanish
+        // Obuna berilganda do'kon avtomatik tasdiqlanadi
+        if (shop.holati === 'kutilmoqda') shop.holati = 'tasdiqlangan'
+      }
+      await shop.save()
+      return NextResponse.json({ ok: true, shop })
+    }
+
     // Egasi o'z do'konini yangilashi
     const egasiMi = user.shopId?.toString() === id
     if (!egasiMi && user.rol !== 'admin') {

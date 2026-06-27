@@ -2,6 +2,7 @@ import { dbConnect } from '@/lib/db'
 import { Shop } from '@/models/Shop'
 import { joylashuvMatn } from '@/lib/format'
 import DokonHolat from '@/components/DokonHolat'
+import ObunaBoshqaruv from '@/components/ObunaBoshqaruv'
 import type { ShopStatus } from '@/models/Shop'
 
 const HOLAT: Record<ShopStatus, { matn: string; rang: string }> = {
@@ -15,6 +16,7 @@ interface AdminShop {
   nomi: string
   telefon?: string
   holati: ShopStatus
+  obunaTugashi: string | null
   joylashuv?: { blok?: string; qator?: string; dokonRaqami?: string }
 }
 
@@ -56,6 +58,9 @@ export default async function AdminDokonlar() {
             </div>
             <div className="mt-3">
               <DokonHolat shopId={s._id} holati={s.holati} />
+            </div>
+            <div className="mt-2">
+              <ObunaBoshqaruv shopId={s._id} obunaTugashi={s.obunaTugashi} />
             </div>
           </div>
         ))}

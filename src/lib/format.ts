@@ -18,6 +18,25 @@ export function joylashuvMatn(joylashuv?: {
   return qismlar.length ? qismlar.join(', ') : "Joylashuv ko'rsatilmagan"
 }
 
+// Obuna faolmi? (tugash sanasi hozirdan keyinmi)
+export function obunaFaolmi(obunaTugashi?: string | Date | null): boolean {
+  if (!obunaTugashi) return false
+  return new Date(obunaTugashi).getTime() > Date.now()
+}
+
+// Obuna tugashiga necha kun qoldi (manfiy = o'tib ketgan)
+export function obunaKunlari(obunaTugashi?: string | Date | null): number {
+  if (!obunaTugashi) return 0
+  const farq = new Date(obunaTugashi).getTime() - Date.now()
+  return Math.ceil(farq / (1000 * 60 * 60 * 24))
+}
+
+// Sanani o'zbekcha ko'rsatish: "27.06.2026"
+export function sanaFormat(sana?: string | Date | null): string {
+  if (!sana) return '—'
+  return new Date(sana).toLocaleDateString('ru-RU')
+}
+
 // Yandex Maps "yo'l ko'rsat" (navigator) havolasi
 export function yandexNavigator(lat: number, lng: number): string {
   return `https://yandex.uz/maps/?rtext=~${lat},${lng}&rtt=auto`

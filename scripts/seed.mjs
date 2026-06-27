@@ -36,6 +36,7 @@ const Shop = mongoose.model(
       telegram: String,
       ishVaqti: String,
       holati: { type: String, default: 'tasdiqlangan' },
+      obunaTugashi: { type: Date, default: null },
       reyting: { type: Number, default: 0 },
     },
     { timestamps: true },
@@ -143,6 +144,9 @@ async function main() {
       parolHash,
       rol: 'shop',
     })
+    // Obuna: 1 yil keyin tugaydi (test uchun faol)
+    const obuna = new Date()
+    obuna.setFullYear(obuna.getFullYear() + 1)
     const shop = await Shop.create({
       nomi: d.nomi,
       egasiId: user._id,
@@ -151,6 +155,7 @@ async function main() {
       telefon: d.telefon,
       ishVaqti: '09:00 - 19:00',
       holati: 'tasdiqlangan',
+      obunaTugashi: obuna,
       reyting: 4 + Math.random(),
     })
     user.shopId = shop._id

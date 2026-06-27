@@ -21,6 +21,9 @@ export interface IShop {
   telegram?: string
   ishVaqti?: string // masalan "09:00 - 19:00"
   holati: ShopStatus
+  // Obuna: shu sanagacha do'kon e'lonlari mijozga ko'rinadi.
+  // null yoki o'tib ketgan bo'lsa — e'lonlar yashirin (obuna kerak).
+  obunaTugashi: Date | null
   reyting: number
   createdAt: Date
   updatedAt: Date
@@ -53,6 +56,7 @@ const ShopSchema = new Schema<IShop>(
       default: 'kutilmoqda',
       index: true,
     },
+    obunaTugashi: { type: Date, default: null, index: true },
     reyting: { type: Number, default: 0, min: 0, max: 5 },
   },
   { timestamps: true },

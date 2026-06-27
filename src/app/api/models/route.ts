@@ -37,7 +37,12 @@ export async function GET(request: NextRequest) {
         },
       },
       { $unwind: '$dokon' },
-      { $match: { 'dokon.holati': 'tasdiqlangan' } },
+      {
+        $match: {
+          'dokon.holati': 'tasdiqlangan',
+          'dokon.obunaTugashi': { $gt: new Date() },
+        },
+      },
       { $sort: { narx: 1 } }, // eng arzon birinchi
       {
         $project: {
