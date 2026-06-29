@@ -1,7 +1,7 @@
 import { Schema, model, models, type Types, type Model } from 'mongoose'
 import type { Tarif } from '@/lib/tariflar'
 
-export type TolovProvider = 'payme' | 'click'
+export type TolovProvider = 'payme' | 'click' | 'karta'
 export type TolovHolat = 'kutilmoqda' | 'tolangan' | 'bekor'
 
 // Bitta to'lov urinishi = bitta "buyurtma" yozuvi.
@@ -49,7 +49,7 @@ const TolovSchema = new Schema<ITolov>(
     summa: { type: Number, required: true, min: 0 },
     provider: {
       type: String,
-      enum: ['payme', 'click'],
+      enum: ['payme', 'click', 'karta'],
       required: true,
     },
     holati: {

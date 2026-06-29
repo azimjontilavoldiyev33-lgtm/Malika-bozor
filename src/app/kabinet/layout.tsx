@@ -55,7 +55,12 @@ export default async function KabinetLayout({
         >
           ➕ Yangi e&apos;lon
         </Link>
-        {/* 💳 Obuna (to'lov) — integratsiya keyinga qoldirildi, havola yashirilgan */}
+        <Link
+          href="/kabinet/tolov"
+          className="rounded-lg px-3 py-2 hover:bg-slate-100"
+        >
+          💳 Obuna
+        </Link>
         <Link
           href="/kabinet/sozlama"
           className="rounded-lg px-3 py-2 hover:bg-slate-100"

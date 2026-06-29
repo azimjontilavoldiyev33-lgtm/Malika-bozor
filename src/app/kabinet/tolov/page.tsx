@@ -14,6 +14,12 @@ const HOLAT_BELGI: Record<string, { matn: string; rang: string }> = {
   bekor: { matn: 'Bekor', rang: 'bg-red-100 text-red-700' },
 }
 
+const PROVIDER_NOMI: Record<string, string> = {
+  payme: 'Payme',
+  click: 'Click',
+  karta: 'Karta',
+}
+
 export default async function TolovSahifa({
   searchParams,
 }: {
@@ -68,7 +74,11 @@ export default async function TolovSahifa({
 
       {/* To'lov formasi */}
       <div className="rounded-2xl border border-slate-200 bg-white p-4">
-        <TolovForm joriyTarif={tarif} />
+        <TolovForm
+          joriyTarif={tarif}
+          karta={process.env.NEXT_PUBLIC_TOLOV_KARTA ?? ''}
+          egasi={process.env.NEXT_PUBLIC_TOLOV_KARTA_EGASI ?? ''}
+        />
       </div>
 
       {/* To'lovlar tarixi */}
@@ -90,7 +100,7 @@ export default async function TolovSahifa({
                       {tarifNomi(t.tarif)} · {t.oy} oy
                     </p>
                     <p className="text-xs text-slate-400">
-                      {t.provider === 'payme' ? 'Payme' : 'Click'} ·{' '}
+                      {PROVIDER_NOMI[t.provider] ?? t.provider} ·{' '}
                       {sanaFormat(t.createdAt)}
                     </p>
                   </div>

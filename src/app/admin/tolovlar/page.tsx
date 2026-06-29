@@ -3,6 +3,7 @@ import { Tolov } from '@/models/Tolov'
 import { Shop } from '@/models/Shop'
 import { narxFormat, sanaFormat } from '@/lib/format'
 import { tarifNomi } from '@/lib/tariflar'
+import TolovTasdiqla from '@/components/TolovTasdiqla'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,6 +11,12 @@ const HOLAT_BELGI: Record<string, { matn: string; rang: string }> = {
   kutilmoqda: { matn: 'Kutilmoqda', rang: 'bg-amber-100 text-amber-700' },
   tolangan: { matn: 'To\'langan', rang: 'bg-emerald-100 text-emerald-700' },
   bekor: { matn: 'Bekor', rang: 'bg-red-100 text-red-700' },
+}
+
+const PROVIDER_NOMI: Record<string, string> = {
+  payme: 'Payme',
+  click: 'Click',
+  karta: 'Karta',
 }
 
 export default async function AdminTolovlar() {
@@ -68,17 +75,21 @@ export default async function AdminTolovlar() {
                     <p className="font-medium">{shopNomi}</p>
                     <p className="text-xs text-slate-400">
                       {tarifNomi(t.tarif)} · {t.oy} oy ·{' '}
-                      {t.provider === 'payme' ? 'Payme' : 'Click'} ·{' '}
+                      {PROVIDER_NOMI[t.provider] ?? t.provider} ·{' '}
                       {sanaFormat(t.createdAt)}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="font-semibold">{narxFormat(t.summa)}</span>
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${belgi.rang}`}
-                    >
-                      {belgi.matn}
-                    </span>
+                    {t.provider === 'karta' && t.holati === 'kutilmoqda' ? (
+                      <TolovTasdiqla id={String(t._id)} />
+                    ) : (
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-xs font-medium ${belgi.rang}`}
+                      >
+                        {belgi.matn}
+                      </span>
+                    )}
                   </div>
                 </div>
               )

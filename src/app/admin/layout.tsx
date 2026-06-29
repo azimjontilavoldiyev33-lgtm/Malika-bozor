@@ -38,7 +38,12 @@ export default async function AdminLayout({
         >
           📱 E&apos;lonlar
         </Link>
-        {/* 💳 To'lovlar — integratsiya keyinga qoldirildi, havola yashirilgan */}
+        <Link
+          href="/admin/tolovlar"
+          className="rounded-lg px-3 py-2 hover:bg-slate-100"
+        >
+          💳 To&apos;lovlar
+        </Link>
       </nav>
 
       {children}
