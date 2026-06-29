@@ -5,6 +5,7 @@ import { dbConnect } from '@/lib/db'
 import { Listing } from '@/models/Listing'
 import '@/models/Shop' // populate uchun ro'yxatdan o'tkazamiz
 import { narxFormat, joylashuvMatn } from '@/lib/format'
+import KorishKuzat from '@/components/KorishKuzat'
 import type { ListingNatija } from '@/lib/types'
 
 export const revalidate = 60 // 60s keshlash (tezlik uchun)
@@ -55,6 +56,8 @@ export default async function TelefonPage({
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6">
+      {/* Bu e'lon (do'kon telefoni) ko'rilishini qayd qilamiz */}
+      <KorishKuzat shopId={String(listing.shopId)} tur="elonKorish" />
       <Link href="/" className="text-sm text-indigo-600 hover:underline">
         ← Orqaga
       </Link>

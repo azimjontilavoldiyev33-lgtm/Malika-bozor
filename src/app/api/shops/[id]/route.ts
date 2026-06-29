@@ -5,6 +5,8 @@ import { Listing } from '@/models/Listing'
 import { shopSchema } from '@/lib/validators'
 import { getCurrentUser } from '@/lib/auth'
 import { TARIF_RUYXATI } from '@/lib/tariflar'
+import { obunaniUzaytir } from '@/lib/obuna'
+import { referralMukofotBer } from '@/lib/referral'
 import { z } from 'zod'
 
 // GET /api/shops/[id] — do'kon + faol e'lonlari (ommaviy)
@@ -84,17 +86,11 @@ export async function PATCH(
       if (oy === 0) {
         shop.obunaTugashi = null
       } else if (oy > 0) {
-        const hozir = Date.now()
-        const joriy = shop.obunaTugashi
-          ? new Date(shop.obunaTugashi).getTime()
-          : 0
-        const boshlanish = new Date(Math.max(hozir, joriy))
-        boshlanish.setMonth(boshlanish.getMonth() + oy)
-        shop.obunaTugashi = boshlanish
-        // Obuna berilganda do'kon avtomatik tasdiqlanadi
-        if (shop.holati === 'kutilmoqda') shop.holati = 'tasdiqlangan'
+        obunaniUzaytir(shop, oy)
       }
       await shop.save()
+      // Birinchi obuna faollashganda taklif mukofotini beramiz
+      if (oy > 0) await referralMukofotBer(shop)
       return NextResponse.json({ ok: true, shop })
     }
 

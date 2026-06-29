@@ -3,8 +3,10 @@ import { getCurrentUser } from '@/lib/auth'
 import { dbConnect } from '@/lib/db'
 import { Shop } from '@/models/Shop'
 import { Listing } from '@/models/Listing'
+import { Statistika, type IStatistika } from '@/models/Statistika'
 import { joylashuvMatn, obunaFaolmi, obunaKunlari, sanaFormat } from '@/lib/format'
 import { tarifNomi, limitMatn, elonLimiti } from '@/lib/tariflar'
+import { oxirgiKunlar } from '@/lib/stat'
 
 const HOLAT_BELGI: Record<string, { matn: string; rang: string }> = {
   kutilmoqda: {
@@ -24,6 +26,21 @@ export default async function KabinetBosh() {
     shopId: user!.shopId,
     faol: true,
   })
+
+  // Bu oygi (30 kun) qiziqish — strategiya bo'yicha qiymatni ko'rsatamiz
+  const kun30 = oxirgiKunlar(30)
+  const statlar = await Statistika.find({
+    shopId: user!.shopId,
+    sana: { $gte: kun30[0] },
+  }).lean<IStatistika[]>()
+  const oyKorish = statlar.reduce(
+    (s, d) => s + d.dokonKorish + d.elonKorish,
+    0,
+  )
+  const oyAloqa = statlar.reduce(
+    (s, d) => s + d.qongiroq + d.telegram + d.yolKorsatma,
+    0,
+  )
 
   const holat = HOLAT_BELGI[shop?.holati ?? 'kutilmoqda']
   const obunaTugashi = shop?.obunaTugashi
@@ -133,7 +150,30 @@ export default async function KabinetBosh() {
         )}
       </div>
 
-      {/* Statistika */}
+      {/* Bu oygi qiziqish (real statistika) */}
+      <Link
+        href="/kabinet/statistika"
+        className="block rounded-2xl border border-indigo-200 bg-indigo-50 p-4 transition hover:bg-indigo-100"
+      >
+        <div className="flex items-center justify-between">
+          <p className="text-sm font-medium text-indigo-900">
+            📈 Bu oy mijozlar qiziqishi
+          </p>
+          <span className="text-xs text-indigo-600">Batafsil →</span>
+        </div>
+        <div className="mt-2 flex gap-6">
+          <div>
+            <p className="text-2xl font-bold text-indigo-700">{oyKorish}</p>
+            <p className="text-xs text-slate-500">ko&apos;rish</p>
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-indigo-700">{oyAloqa}</p>
+            <p className="text-xs text-slate-500">aloqa (qo&apos;ng&apos;iroq/yo&apos;l)</p>
+          </div>
+        </div>
+      </Link>
+
+      {/* E'lonlar soni */}
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-2xl border border-slate-200 bg-white p-4">
           <p className="text-3xl font-bold">{elonlarSoni}</p>
@@ -144,6 +184,22 @@ export default async function KabinetBosh() {
           <p className="text-sm text-slate-500">Faol e&apos;lonlar</p>
         </div>
       </div>
+
+      {/* Taklif qilish CTA */}
+      <Link
+        href="/kabinet/referral"
+        className="flex items-center justify-between rounded-2xl border border-emerald-200 bg-emerald-50 p-4 transition hover:bg-emerald-100"
+      >
+        <div>
+          <p className="text-sm font-medium text-emerald-900">
+            🎁 Do&apos;st do&apos;konni taklif qiling
+          </p>
+          <p className="mt-0.5 text-xs text-slate-600">
+            U to&apos;lov qilsa — ikkalangizga 1 oy bepul obuna
+          </p>
+        </div>
+        <span className="text-xs font-medium text-emerald-700">Havola →</span>
+      </Link>
 
       <div className="flex gap-2">
         <Link

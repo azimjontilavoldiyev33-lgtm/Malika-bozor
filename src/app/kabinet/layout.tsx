@@ -38,11 +38,24 @@ export default async function KabinetLayout({
           📱 E&apos;lonlarim
         </Link>
         <Link
+          href="/kabinet/statistika"
+          className="rounded-lg px-3 py-2 hover:bg-slate-100"
+        >
+          📈 Statistika
+        </Link>
+        <Link
+          href="/kabinet/referral"
+          className="rounded-lg px-3 py-2 hover:bg-slate-100"
+        >
+          🎁 Taklif qil
+        </Link>
+        <Link
           href="/kabinet/elon/yangi"
           className="rounded-lg px-3 py-2 hover:bg-slate-100"
         >
           ➕ Yangi e&apos;lon
         </Link>
+        {/* 💳 Obuna (to'lov) — integratsiya keyinga qoldirildi, havola yashirilgan */}
         <Link
           href="/kabinet/sozlama"
           className="rounded-lg px-3 py-2 hover:bg-slate-100"

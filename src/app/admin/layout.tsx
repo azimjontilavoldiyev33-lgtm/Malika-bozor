@@ -38,6 +38,7 @@ export default async function AdminLayout({
         >
           📱 E&apos;lonlar
         </Link>
+        {/* 💳 To'lovlar — integratsiya keyinga qoldirildi, havola yashirilgan */}
       </nav>
 
       {children}

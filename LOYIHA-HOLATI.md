@@ -40,8 +40,9 @@ JWT (jose) · bcryptjs · Zod · Cloudinary (rasm) · OpenStreetMap/Google (xari
 ## 💼 Biznes modeli: Vitrina + Obuna
 
 Sotuv **do'konda** bo'ladi (ilovada onlayn sotuv yo'q). Daromad — do'konlar oylik
-**obuna** to'laydi (hozircha to'lov qo'lda, admin tasdiqlaydi). Faqat tasdiqlangan +
-obunasi faol do'kon e'lonlari mijozga ko'rinadi.
+**obuna** to'laydi. To'lov **Payme/Click** orqali avtomatlashtirilgan (admin qo'lda
+uzaytirish ham zaxira sifatida saqlangan). Faqat tasdiqlangan + obunasi faol do'kon
+e'lonlari mijozga ko'rinadi.
 
 ### Tariflar (`src/lib/tariflar.ts`)
 
@@ -61,8 +62,18 @@ obunasi faol do'kon e'lonlari mijozga ko'rinadi.
 - Do'kon kabineti — e'lon CRUD, rasm yuklash (Cloudinary), sozlama, limit ko'rsatkichi
 - Admin panel — statistika, do'kon tasdiqlash/bloklash, obuna uzaytirish, tarif tanlash, e'lon moderatsiyasi
 - Obuna + tarif/limit (biznes modeli)
+- **To'lov: Payme + Click** — kabinetda (`/kabinet/tolov`) tarif+muddat tanlash → provayder
+  checkout → webhook obunani avtomatik uzaytiradi. Admin tarixi: `/admin/tolovlar`
 - PWA (telefonga o'rnatiladi) + zamonaviy dizayn + mobil pastki navigatsiya
 - Tezlik: ommaviy API edge keshlash + sahifalar ISR (`revalidate=60`)
+- **Statistika** (`/kabinet/statistika`) — do'kon/e'lon ko'rishlari, qo'ng'iroq,
+  telegram, yo'l ko'rsatma kunlik agregat (`Statistika` modeli, `$inc` upsert).
+  Mijoz tomonda `sendBeacon` orqali `/api/stat`'ga yoziladi (ISR keshni buzmaydi).
+  Do'konni obunaga ko'ndirish quroli: "bu oy X ko'rish, Y aloqa, Z% aloqa darajasi"
+- **Referral** (`/kabinet/referral`) — har do'konda noyob taklif kodi + havola
+  (`/royxat?ref=KOD`). Taklif qilingan do'kon **birinchi marta to'lov qilganda**
+  (admin qo'lda uzaytirish ham, avto to'lov ham) `referralMukofotBer` ikkala
+  do'konga +1 oy obuna qo'shadi (idempotent, `referralMukofotBerildi` bayrog'i)
 
 ---
 
@@ -82,6 +93,13 @@ deploy Vercel env'da). Deploy: `git push` → Vercel avtomatik.
 `MONGODB_URI`, `JWT_SECRET`, `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`,
 `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET`, `NEXT_PUBLIC_GOOGLE_MAPS_KEY` (ixtiyoriy).
 
+**To'lov:** `NEXT_PUBLIC_BASE_URL`, `PAYME_MERCHANT_ID`, `PAYME_KEY`,
+`PAYME_CHECKOUT_URL`, `CLICK_SERVICE_ID`, `CLICK_MERCHANT_ID`, `CLICK_SECRET_KEY`,
+`CLICK_MERCHANT_USER_ID`. Namuna izohlar bilan `.env.local`da. Hozir sandbox uchun
+qurilgan — haqiqiy kassa (Payme business / Click merchant) ro'yxatdan o'tgach kalitlar
+to'ldiriladi. Webhook URL'lar: `/api/tolov/payme` (Basic-auth `Paycom:KEY`, "ac" maydoni
+`order_id`) va `/api/tolov/click` (Prepare+Complete, MD5 imzo).
+
 ---
 
 ## ⚠️ Muhim eslatmalar
@@ -93,7 +111,9 @@ deploy Vercel env'da). Deploy: `git push` → Vercel avtomatik.
 
 ## 📌 Keyingi mumkin ishlar
 
-- Payme/Click to'lov (obunani avtomatlashtirish)
+- **Payme/Click**: haqiqiy kassa kalitlarini olish + sandbox'da to'liq sinash (Payme test
+  protokoli, Click prepare/complete) → prod'ga ulash
 - Atlas regionini Vercel'ga yaqinlashtirish + M10+ tarif (haqiqiy tezlik)
-- Do'konlarni jalb qilish strategiyasi
+- Do'konlarni jalb qilish strategiyasi (statistika + referral tayyor; keyingisi —
+  bozorda QR plakat, Telegram kanal, birinchi do'konlarni qo'lda jalb qilish)
 - Reyting/sharhlar, sevimlilar, Telegram bot, o'z domeni

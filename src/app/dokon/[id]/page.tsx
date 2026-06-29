@@ -5,6 +5,8 @@ import { dbConnect } from '@/lib/db'
 import { Shop } from '@/models/Shop'
 import { Listing } from '@/models/Listing'
 import PhoneCard from '@/components/PhoneCard'
+import KorishKuzat from '@/components/KorishKuzat'
+import KuzatilganLink from '@/components/KuzatilganLink'
 import {
   joylashuvMatn,
   yandexNavigator,
@@ -45,6 +47,8 @@ export default async function DokonPage({
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6">
+      {/* Do'kon sahifasi ko'rilishini qayd qilamiz */}
+      <KorishKuzat shopId={shop._id} tur="dokonKorish" />
       <Link href="/" className="text-sm text-indigo-600 hover:underline">
         ← Orqaga
       </Link>
@@ -60,41 +64,49 @@ export default async function DokonPage({
         {/* Aloqa tugmalari */}
         <div className="mt-4 flex flex-wrap gap-2">
           {shop.telefon && (
-            <a
+            <KuzatilganLink
+              shopId={shop._id}
+              tur="qongiroq"
               href={`tel:${shop.telefon}`}
               className="flex items-center gap-1 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
             >
               📞 Qo&apos;ng&apos;iroq
-            </a>
+            </KuzatilganLink>
           )}
           {shop.telegram && (
-            <a
+            <KuzatilganLink
+              shopId={shop._id}
+              tur="telegram"
               href={`https://t.me/${shop.telegram.replace('@', '')}`}
               target="_blank"
               rel="noreferrer"
               className="flex items-center gap-1 rounded-xl bg-sky-500 px-4 py-2 text-sm font-medium text-white hover:bg-sky-600"
             >
               ✈️ Telegram
-            </a>
+            </KuzatilganLink>
           )}
           {geo && (
             <>
-              <a
+              <KuzatilganLink
+                shopId={shop._id}
+                tur="yolKorsatma"
                 href={yandexNavigator(geo.lat, geo.lng)}
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center gap-1 rounded-xl bg-amber-500 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600"
               >
                 🧭 Yo&apos;l ko&apos;rsat (Yandex)
-              </a>
-              <a
+              </KuzatilganLink>
+              <KuzatilganLink
+                shopId={shop._id}
+                tur="yolKorsatma"
                 href={googleNavigator(geo.lat, geo.lng)}
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center gap-1 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
               >
                 🧭 Google Maps
-              </a>
+              </KuzatilganLink>
             </>
           )}
         </div>

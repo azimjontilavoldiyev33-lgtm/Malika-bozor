@@ -10,6 +10,7 @@ export const royxatSchema = z.object({
     .regex(telefonRegex, 'Telefon raqami noto\'g\'ri (masalan: 901234567)'),
   parol: z.string().min(6, 'Parol kamida 6 belgi bo\'lsin'),
   dokonNomi: z.string().min(2, 'Do\'kon nomini kiriting'),
+  refKod: z.string().trim().optional(), // ixtiyoriy taklif kodi
 })
 
 export const kirishSchema = z.object({

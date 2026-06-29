@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
@@ -11,9 +11,16 @@ export default function RoyxatPage() {
     dokonNomi: '',
     telefon: '',
     parol: '',
+    refKod: '',
   })
   const [xato, setXato] = useState('')
   const [yuklanmoqda, setYuklanmoqda] = useState(false)
+
+  // Havoladagi ?ref=KOD ni taklif kodi maydoniga avtomatik joylash
+  useEffect(() => {
+    const ref = new URLSearchParams(window.location.search).get('ref')
+    if (ref) setForm((f) => ({ ...f, refKod: ref.toUpperCase() }))
+  }, [])
 
   function o(k: keyof typeof form) {
     return (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -98,6 +105,24 @@ export default function RoyxatPage() {
             className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 outline-none focus:border-indigo-400"
             required
           />
+        </div>
+        <div>
+          <label className="mb-1 block text-sm font-medium">
+            Taklif kodi{' '}
+            <span className="font-normal text-slate-400">(ixtiyoriy)</span>
+          </label>
+          <input
+            value={form.refKod}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, refKod: e.target.value.toUpperCase() }))
+            }
+            placeholder="Masalan: K7M2QX"
+            className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 uppercase outline-none focus:border-indigo-400"
+          />
+          <p className="mt-1 text-xs text-slate-400">
+            Sizni do&apos;st do&apos;kon taklif qilgan bo&apos;lsa, kodini
+            kiriting — birinchi to&apos;lovda ikkalangizga 1 oy bepul.
+          </p>
         </div>
         <button
           disabled={yuklanmoqda}

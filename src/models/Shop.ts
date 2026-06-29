@@ -27,6 +27,10 @@ export interface IShop {
   obunaTugashi: Date | null
   tarif: Tarif // e'lon limitini belgilaydi
   reyting: number
+  // Referral (taklif) tizimi
+  referralKod?: string // shu do'konning noyob taklif kodi
+  taklifQilgan?: Types.ObjectId // shu do'konni taklif qilgan boshqa Shop._id
+  referralMukofotBerildi: boolean // birinchi to'lovda taklifchiga mukofot berildimi
   createdAt: Date
   updatedAt: Date
 }
@@ -65,6 +69,15 @@ const ShopSchema = new Schema<IShop>(
       default: 'boshlangich',
     },
     reyting: { type: Number, default: 0, min: 0, max: 5 },
+    referralKod: {
+      type: String,
+      unique: true,
+      sparse: true, // hammada bo'lmasligi mumkin (eski do'konlar)
+      uppercase: true,
+      trim: true,
+    },
+    taklifQilgan: { type: Schema.Types.ObjectId, ref: 'Shop', index: true },
+    referralMukofotBerildi: { type: Boolean, default: false },
   },
   { timestamps: true },
 )

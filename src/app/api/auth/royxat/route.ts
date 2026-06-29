@@ -4,6 +4,7 @@ import { User } from '@/models/User'
 import { Shop } from '@/models/Shop'
 import { royxatSchema } from '@/lib/validators'
 import { parolHashla, telefonNormalize, sessionOrnat } from '@/lib/auth'
+import { noyobReferralKod } from '@/lib/referral'
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,15 +32,27 @@ export async function POST(request: NextRequest) {
 
     const parolHash = await parolHashla(parol)
 
+    // Taklif kodi berilgan bo'lsa — taklif qilgan do'konni topamiz
+    let taklifQilgan: typeof Shop.prototype._id | undefined
+    const refKod = parsed.data.refKod?.toUpperCase()
+    if (refKod) {
+      const taklifchi = await Shop.findOne({ referralKod: refKod })
+        .select('_id')
+        .lean()
+      if (taklifchi) taklifQilgan = taklifchi._id
+    }
+
     // 1) Foydalanuvchi
     const user = await User.create({ ism, telefon, parolHash, rol: 'shop' })
 
-    // 2) Do'kon (admin tasdiqlaguncha "kutilmoqda")
+    // 2) Do'kon (admin tasdiqlaguncha "kutilmoqda") — o'z taklif kodi bilan
     const shop = await Shop.create({
       nomi: dokonNomi,
       egasiId: user._id,
       telefon,
       holati: 'kutilmoqda',
+      referralKod: await noyobReferralKod(),
+      taklifQilgan,
     })
 
     // 3) Foydalanuvchiga do'konni bog'lash
