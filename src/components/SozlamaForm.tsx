@@ -2,6 +2,17 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic'
+
+// Leaflet faqat brauzerda ishlaydi — SSR'siz yuklaymiz
+const JoylashuvXarita = dynamic(() => import('./JoylashuvXarita'), {
+  ssr: false,
+  loading: () => (
+    <div className="grid h-64 w-full place-items-center rounded-xl border border-slate-200 bg-slate-50 text-sm text-slate-400">
+      Xarita yuklanmoqda…
+    </div>
+  ),
+})
 
 export interface ShopBoshlangich {
   _id: string
@@ -29,6 +40,8 @@ export default function SozlamaForm({ shop }: { shop: ShopBoshlangich }) {
   const [xato, setXato] = useState('')
   const [xabar, setXabar] = useState('')
   const [yuklanmoqda, setYuklanmoqda] = useState(false)
+  // "Tozalash" bosilganda xaritani qayta yuklash uchun (marker ham o'chsin)
+  const [xaritaKey, setXaritaKey] = useState(0)
 
   function s<K extends keyof typeof form>(k: K, v: string) {
     setForm((f) => ({ ...f, [k]: v }))
@@ -127,20 +140,46 @@ export default function SozlamaForm({ shop }: { shop: ShopBoshlangich }) {
       </fieldset>
 
       <fieldset className="rounded-2xl border border-slate-200 p-3">
-        <legend className="px-1 text-sm font-medium">Xarita koordinatasi (ixtiyoriy)</legend>
+        <legend className="px-1 text-sm font-medium">
+          Do&apos;kon joylashuvi (xaritada)
+        </legend>
         <p className="mb-2 text-xs text-slate-500">
-          Yandex/Google Maps&apos;dan nuqtani bosib, koordinatani ko&apos;chiring.
+          Do&apos;koningizda turib &quot;Joriy joylashuvim&quot; tugmasini bosing —
+          mijozlar xaritadan sizni topadi.
         </p>
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="mb-1 block text-xs text-slate-500">Lat (kenglik)</label>
-            <input value={form.lat} onChange={(e) => s('lat', e.target.value)} placeholder="41.311" inputMode="decimal" className={inp} />
+        <JoylashuvXarita
+          key={xaritaKey}
+          lat={form.lat ? Number(form.lat) : undefined}
+          lng={form.lng ? Number(form.lng) : undefined}
+          onChange={(la, ln) =>
+            setForm((f) => ({
+              ...f,
+              lat: la.toFixed(6),
+              lng: ln.toFixed(6),
+            }))
+          }
+        />
+        {form.lat && form.lng ? (
+          <div className="mt-2 flex items-center justify-between rounded-lg bg-emerald-50 px-3 py-2 text-xs">
+            <span className="text-emerald-700">
+              ✅ Belgilandi: {form.lat}, {form.lng}
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                setForm((f) => ({ ...f, lat: '', lng: '' }))
+                setXaritaKey((k) => k + 1)
+              }}
+              className="font-medium text-red-600 hover:underline"
+            >
+              Tozalash
+            </button>
           </div>
-          <div>
-            <label className="mb-1 block text-xs text-slate-500">Lng (uzunlik)</label>
-            <input value={form.lng} onChange={(e) => s('lng', e.target.value)} placeholder="69.279" inputMode="decimal" className={inp} />
-          </div>
-        </div>
+        ) : (
+          <p className="mt-2 text-xs text-slate-400">
+            Joylashuv hali belgilanmagan (ixtiyoriy).
+          </p>
+        )}
       </fieldset>
 
       <button
