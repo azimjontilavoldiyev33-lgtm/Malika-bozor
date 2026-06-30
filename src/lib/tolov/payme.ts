@@ -38,6 +38,8 @@ export function paymeCheckoutUrl(
 
 // Webhook Basic-auth: "Basic base64(Paycom:KEY)"
 export function paymeAuthTekshir(authHeader: string | null): boolean {
+  // Kalit sozlanmagan bo'lsa — webhook'ni umuman qabul qilmaymiz (fail-closed)
+  if (!PAYME_KEY) return false
   if (!authHeader?.startsWith('Basic ')) return false
   try {
     const dekod = Buffer.from(authHeader.slice(6), 'base64').toString('utf8')

@@ -46,6 +46,10 @@ export interface ClickCallback {
 // Imzoni tekshirish. Prepare va Complete uchun string tarkibi farq qiladi
 // (Complete'da merchant_prepare_id qo'shiladi).
 export function clickImzoTekshir(cb: ClickCallback): boolean {
+  // Maxfiy kalit sozlanmagan bo'lsa — hech qaysi callback'ga ishonmaymiz.
+  // (Aks holda hujumchi bo'sh kalit bilan to'g'ri imzo yasab, soxta to'lov yubora oladi.)
+  if (!CLICK_SECRET_KEY) return false
+
   const action = Number(cb.action)
   const qismlar = [
     cb.click_trans_id,
