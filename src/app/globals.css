@@ -21,6 +21,13 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Klaviatura bilan yurganda ko'rinadigan fokus halqasi (sichqoncha bosishda chiqmaydi) */
+:focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 /* Yumshoq paydo bo'lish animatsiyasi */
 @keyframes mb-fade-up {
   from {

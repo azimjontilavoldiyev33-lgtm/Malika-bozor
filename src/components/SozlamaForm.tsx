@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 
@@ -42,6 +42,13 @@ export default function SozlamaForm({ shop }: { shop: ShopBoshlangich }) {
   const [yuklanmoqda, setYuklanmoqda] = useState(false)
   // "Tozalash" bosilganda xaritani qayta yuklash uchun (marker ham o'chsin)
   const [xaritaKey, setXaritaKey] = useState(0)
+
+  // Muvaffaqiyat xabari 3 soniyadan keyin o'chsin
+  useEffect(() => {
+    if (!xabar) return
+    const t = setTimeout(() => setXabar(''), 3000)
+    return () => clearTimeout(t)
+  }, [xabar])
 
   function s<K extends keyof typeof form>(k: K, v: string) {
     setForm((f) => ({ ...f, [k]: v }))
@@ -101,40 +108,40 @@ export default function SozlamaForm({ shop }: { shop: ShopBoshlangich }) {
       )}
 
       <div>
-        <label className="mb-1 block text-sm font-medium">Do&apos;kon nomi</label>
-        <input value={form.nomi} onChange={(e) => s('nomi', e.target.value)} className={inp} required />
+        <label htmlFor="s-nomi" className="mb-1 block text-sm font-medium">Do&apos;kon nomi</label>
+        <input id="s-nomi" value={form.nomi} onChange={(e) => s('nomi', e.target.value)} className={inp} required />
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="mb-1 block text-sm font-medium">Telefon</label>
-          <input value={form.telefon} onChange={(e) => s('telefon', e.target.value)} className={inp} />
+          <label htmlFor="s-telefon" className="mb-1 block text-sm font-medium">Telefon</label>
+          <input id="s-telefon" type="tel" inputMode="tel" autoComplete="tel" value={form.telefon} onChange={(e) => s('telefon', e.target.value)} className={inp} />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium">Telegram</label>
-          <input value={form.telegram} onChange={(e) => s('telegram', e.target.value)} placeholder="@username" className={inp} />
+          <label htmlFor="s-telegram" className="mb-1 block text-sm font-medium">Telegram</label>
+          <input id="s-telegram" value={form.telegram} onChange={(e) => s('telegram', e.target.value)} placeholder="@username" className={inp} />
         </div>
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium">Ish vaqti</label>
-        <input value={form.ishVaqti} onChange={(e) => s('ishVaqti', e.target.value)} placeholder="09:00 - 19:00" className={inp} />
+        <label htmlFor="s-ishVaqti" className="mb-1 block text-sm font-medium">Ish vaqti</label>
+        <input id="s-ishVaqti" value={form.ishVaqti} onChange={(e) => s('ishVaqti', e.target.value)} placeholder="09:00 - 19:00" className={inp} />
       </div>
 
       <fieldset className="rounded-2xl border border-slate-200 p-3">
         <legend className="px-1 text-sm font-medium">Bozordagi joylashuv</legend>
         <div className="grid grid-cols-3 gap-3">
           <div>
-            <label className="mb-1 block text-xs text-slate-500">Blok</label>
-            <input value={form.blok} onChange={(e) => s('blok', e.target.value)} placeholder="B" className={inp} />
+            <label htmlFor="s-blok" className="mb-1 block text-xs text-slate-500">Blok</label>
+            <input id="s-blok" value={form.blok} onChange={(e) => s('blok', e.target.value)} placeholder="B" className={inp} />
           </div>
           <div>
-            <label className="mb-1 block text-xs text-slate-500">Qator</label>
-            <input value={form.qator} onChange={(e) => s('qator', e.target.value)} placeholder="3" className={inp} />
+            <label htmlFor="s-qator" className="mb-1 block text-xs text-slate-500">Qator</label>
+            <input id="s-qator" value={form.qator} onChange={(e) => s('qator', e.target.value)} placeholder="3" className={inp} />
           </div>
           <div>
-            <label className="mb-1 block text-xs text-slate-500">Do&apos;kon №</label>
-            <input value={form.dokonRaqami} onChange={(e) => s('dokonRaqami', e.target.value)} placeholder="12" className={inp} />
+            <label htmlFor="s-dokonRaqami" className="mb-1 block text-xs text-slate-500">Do&apos;kon №</label>
+            <input id="s-dokonRaqami" value={form.dokonRaqami} onChange={(e) => s('dokonRaqami', e.target.value)} placeholder="12" className={inp} />
           </div>
         </div>
       </fieldset>

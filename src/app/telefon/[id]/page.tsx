@@ -1,14 +1,33 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import mongoose from 'mongoose'
+import type { Metadata } from 'next'
 import { dbConnect } from '@/lib/db'
 import { Listing } from '@/models/Listing'
 import '@/models/Shop' // populate uchun ro'yxatdan o'tkazamiz
 import { narxFormat, joylashuvMatn } from '@/lib/format'
 import KorishKuzat from '@/components/KorishKuzat'
+import OrqagaTugma from '@/components/OrqagaTugma'
 import type { ListingNatija } from '@/lib/types'
 
 export const revalidate = 60 // 60s keshlash (tezlik uchun)
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}): Promise<Metadata> {
+  const { id } = await params
+  if (!mongoose.isValidObjectId(id)) return { title: 'Telefon — Malika Bozor' }
+  await dbConnect()
+  const listing = await Listing.findById(id).lean()
+  if (!listing) return { title: 'Topilmadi — Malika Bozor' }
+  const nom = `${listing.model}${listing.xotira ? ` ${listing.xotira}` : ''}`
+  return {
+    title: `${nom} narxlari — Malika Bozor`,
+    description: `${listing.brend} ${nom} — Malika bozoridagi do'konlar narxini solishtiring.`,
+  }
+}
 
 export default async function TelefonPage({
   params,
@@ -58,9 +77,7 @@ export default async function TelefonPage({
     <div className="mx-auto max-w-3xl px-4 py-6">
       {/* Bu e'lon (do'kon telefoni) ko'rilishini qayd qilamiz */}
       <KorishKuzat shopId={String(listing.shopId)} tur="elonKorish" />
-      <Link href="/" className="text-sm text-indigo-600 hover:underline">
-        ← Orqaga
-      </Link>
+      <OrqagaTugma />
 
       {/* Telefon sarlavhasi */}
       <div className="mt-3 flex gap-4 rounded-2xl border border-slate-200 bg-white p-4">
@@ -70,6 +87,7 @@ export default async function TelefonPage({
             <img
               src={listing.rasmlar[0]}
               alt={listing.model}
+              decoding="async"
               className="h-full w-full object-cover"
             />
           ) : (

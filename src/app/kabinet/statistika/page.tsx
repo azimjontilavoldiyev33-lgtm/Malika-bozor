@@ -156,6 +156,7 @@ export default async function StatistikaPage() {
                 key={u.sana}
                 className="flex flex-1 flex-col items-center gap-1"
                 title={`${u.sana.slice(5)}: ${u.korish} ko'rish, ${u.aloqa} aloqa`}
+                aria-label={`${u.sana.slice(5)}: ${u.korish} ko'rish, ${u.aloqa} aloqa`}
               >
                 <div className="flex w-full flex-1 items-end">
                   <div

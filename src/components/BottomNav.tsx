@@ -13,7 +13,8 @@ export default function BottomNav() {
   const pathname = usePathname()
 
   // Kabinet/admin ichida pastki nav ko'rsatmaymiz (ularning o'z navigatsiyasi bor)
-  if (pathname.startsWith('/admin')) return null
+  if (pathname.startsWith('/admin') || pathname.startsWith('/kabinet'))
+    return null
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 backdrop-blur md:hidden">

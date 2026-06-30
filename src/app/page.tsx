@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import QidiruvPanel from '@/components/QidiruvPanel'
 
 export default function Home() {
@@ -36,7 +37,9 @@ export default function Home() {
 
       {/* Qidiruv + natijalar */}
       <section className="pb-16">
-        <QidiruvPanel />
+        <Suspense fallback={<div className="mx-auto max-w-5xl px-4 -mt-8 h-24" />}>
+          <QidiruvPanel />
+        </Suspense>
       </section>
     </div>
   )

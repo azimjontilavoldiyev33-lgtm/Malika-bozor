@@ -92,7 +92,13 @@ export default function RasmYuklash({
               className="relative h-20 w-20 overflow-hidden rounded-xl border border-slate-200"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={url} alt="rasm" className="h-full w-full object-cover" />
+              <img
+                src={url}
+                alt="Yuklangan rasm"
+                loading="lazy"
+                decoding="async"
+                className="h-full w-full object-cover"
+              />
               <button
                 type="button"
                 onClick={() => ochir(url)}

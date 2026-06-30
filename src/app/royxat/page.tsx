@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import ParolMaydoni from '@/components/ParolMaydoni'
 
 export default function RoyxatPage() {
   const router = useRouter()
@@ -15,6 +16,12 @@ export default function RoyxatPage() {
   })
   const [xato, setXato] = useState('')
   const [yuklanmoqda, setYuklanmoqda] = useState(false)
+  const xatoRef = useRef<HTMLParagraphElement>(null)
+
+  // Xato chiqsa — uni ko'rinishga olib kelamiz (uzun formada pastda qolmasin)
+  useEffect(() => {
+    if (xato) xatoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, [xato])
 
   // Havoladagi ?ref=KOD ni taklif kodi maydoniga avtomatik joylash
   useEffect(() => {
@@ -61,13 +68,20 @@ export default function RoyxatPage() {
 
       <form onSubmit={topshir} className="mt-6 space-y-4">
         {xato && (
-          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+          <p
+            ref={xatoRef}
+            className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600"
+          >
             {xato}
           </p>
         )}
         <div>
-          <label className="mb-1 block text-sm font-medium">Ismingiz</label>
+          <label htmlFor="ism" className="mb-1 block text-sm font-medium">
+            Ismingiz
+          </label>
           <input
+            id="ism"
+            autoComplete="name"
             value={form.ism}
             onChange={o('ism')}
             placeholder="Aziz"
@@ -76,8 +90,12 @@ export default function RoyxatPage() {
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium">Do&apos;kon nomi</label>
+          <label htmlFor="dokonNomi" className="mb-1 block text-sm font-medium">
+            Do&apos;kon nomi
+          </label>
           <input
+            id="dokonNomi"
+            autoComplete="organization"
             value={form.dokonNomi}
             onChange={o('dokonNomi')}
             placeholder="Aziz Mobile"
@@ -86,8 +104,14 @@ export default function RoyxatPage() {
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium">Telefon</label>
+          <label htmlFor="telefon" className="mb-1 block text-sm font-medium">
+            Telefon
+          </label>
           <input
+            id="telefon"
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
             value={form.telefon}
             onChange={o('telefon')}
             placeholder="901234567"
@@ -96,22 +120,25 @@ export default function RoyxatPage() {
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium">Parol</label>
-          <input
-            type="password"
+          <label htmlFor="parol" className="mb-1 block text-sm font-medium">
+            Parol
+          </label>
+          <ParolMaydoni
+            id="parol"
             value={form.parol}
-            onChange={o('parol')}
+            onChange={(v) => setForm((f) => ({ ...f, parol: v }))}
             placeholder="Kamida 6 belgi"
-            className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 outline-none focus:border-indigo-400"
+            autoComplete="new-password"
             required
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium">
+          <label htmlFor="refKod" className="mb-1 block text-sm font-medium">
             Taklif kodi{' '}
             <span className="font-normal text-slate-400">(ixtiyoriy)</span>
           </label>
           <input
+            id="refKod"
             value={form.refKod}
             onChange={(e) =>
               setForm((f) => ({ ...f, refKod: e.target.value.toUpperCase() }))

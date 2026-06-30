@@ -37,6 +37,17 @@ export function sanaFormat(sana?: string | Date | null): string {
   return new Date(sana).toLocaleDateString('ru-RU')
 }
 
+// Telegram havolasini turli kiritishlardan yasaydi:
+//  "@aziz", "aziz", "https://t.me/aziz", "t.me/aziz" -> "https://t.me/aziz"
+export function telegramHavola(telegram: string): string {
+  const nik = telegram
+    .trim()
+    .replace(/^https?:\/\//i, '')
+    .replace(/^t\.me\//i, '')
+    .replace(/^@/, '')
+  return `https://t.me/${nik}`
+}
+
 // Yandex Maps "yo'l ko'rsat" (navigator) havolasi
 export function yandexNavigator(lat: number, lng: number): string {
   return `https://yandex.uz/maps/?rtext=~${lat},${lng}&rtt=auto`

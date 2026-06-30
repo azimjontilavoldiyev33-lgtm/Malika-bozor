@@ -21,6 +21,7 @@ export default function ElonlarimPage() {
   const [elonlar, setElonlar] = useState<Elon[]>([])
   const [yuklanmoqda, setYuklanmoqda] = useState(true)
   const [ochirilmoqda, setOchirilmoqda] = useState<string | null>(null)
+  const [tasdiqId, setTasdiqId] = useState<string | null>(null) // o'chirishni tasdiqlash kutilayotgan e'lon
 
   async function yukla() {
     setYuklanmoqda(true)
@@ -35,7 +36,7 @@ export default function ElonlarimPage() {
   }, [])
 
   async function ochir(id: string) {
-    if (!confirm('E\'lonni o\'chirishni tasdiqlaysizmi?')) return
+    setTasdiqId(null)
     setOchirilmoqda(id)
     const res = await fetch(`/api/listings/${id}`, { method: 'DELETE' })
     if (res.ok) setElonlar((e) => e.filter((x) => x._id !== id))
@@ -59,9 +60,16 @@ export default function ElonlarimPage() {
       </div>
 
       {elonlar.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-slate-300 bg-white py-12 text-center text-slate-500">
-          Hali e&apos;lon qo&apos;shmagansiz
-        </p>
+        <div className="rounded-2xl border border-dashed border-slate-300 bg-white py-12 text-center text-slate-500">
+          <p className="text-4xl">📱</p>
+          <p className="mt-2">Hali e&apos;lon qo&apos;shmagansiz</p>
+          <Link
+            href="/kabinet/elon/yangi"
+            className="mt-4 inline-block rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+          >
+            ➕ Birinchi e&apos;lonni qo&apos;shish
+          </Link>
+        </div>
       ) : (
         <div className="space-y-2">
           {elonlar.map((e) => (
@@ -75,6 +83,8 @@ export default function ElonlarimPage() {
                   <img
                     src={e.rasmlar[0]}
                     alt={e.model}
+                    loading="lazy"
+                    decoding="async"
                     className="h-full w-full object-cover"
                   />
                 ) : (
@@ -97,19 +107,38 @@ export default function ElonlarimPage() {
                 </div>
               </div>
               <div className="flex shrink-0 flex-col gap-1">
-                <Link
-                  href={`/kabinet/elon/${e._id}/tahrir`}
-                  className="rounded-lg border border-slate-200 px-3 py-1 text-xs hover:bg-slate-50"
-                >
-                  ✏️ Tahrir
-                </Link>
-                <button
-                  onClick={() => ochir(e._id)}
-                  disabled={ochirilmoqda === e._id}
-                  className="rounded-lg border border-red-200 px-3 py-1 text-xs text-red-600 hover:bg-red-50 disabled:opacity-50"
-                >
-                  🗑️ O&apos;chir
-                </button>
+                {tasdiqId === e._id ? (
+                  <>
+                    <button
+                      onClick={() => ochir(e._id)}
+                      disabled={ochirilmoqda === e._id}
+                      className="rounded-lg bg-red-600 px-3 py-1 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50"
+                    >
+                      {ochirilmoqda === e._id ? '…' : 'Ha, o\'chir'}
+                    </button>
+                    <button
+                      onClick={() => setTasdiqId(null)}
+                      className="rounded-lg border border-slate-200 px-3 py-1 text-xs hover:bg-slate-50"
+                    >
+                      Yo&apos;q
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href={`/kabinet/elon/${e._id}/tahrir`}
+                      className="rounded-lg border border-slate-200 px-3 py-1 text-xs hover:bg-slate-50"
+                    >
+                      ✏️ Tahrir
+                    </Link>
+                    <button
+                      onClick={() => setTasdiqId(e._id)}
+                      className="rounded-lg border border-red-200 px-3 py-1 text-xs text-red-600 hover:bg-red-50"
+                    >
+                      🗑️ O&apos;chir
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           ))}

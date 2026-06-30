@@ -1,22 +1,40 @@
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import mongoose from 'mongoose'
+import type { Metadata } from 'next'
 import { dbConnect } from '@/lib/db'
 import { Shop } from '@/models/Shop'
 import { Listing } from '@/models/Listing'
 import PhoneCard from '@/components/PhoneCard'
 import KorishKuzat from '@/components/KorishKuzat'
 import KuzatilganLink from '@/components/KuzatilganLink'
+import OrqagaTugma from '@/components/OrqagaTugma'
 import {
   joylashuvMatn,
   yandexNavigator,
   googleNavigator,
   xaritaEmbed,
   obunaFaolmi,
+  telegramHavola,
 } from '@/lib/format'
 import type { ListingNatija } from '@/lib/types'
 
 export const revalidate = 60 // 60s keshlash (tezlik uchun)
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}): Promise<Metadata> {
+  const { id } = await params
+  if (!mongoose.isValidObjectId(id)) return { title: "Do'kon — Malika Bozor" }
+  await dbConnect()
+  const shop = await Shop.findById(id).lean()
+  if (!shop) return { title: 'Topilmadi — Malika Bozor' }
+  return {
+    title: `${shop.nomi} — Malika Bozor`,
+    description: `${shop.nomi} (${joylashuvMatn(shop.joylashuv)}) — telefonlar, narxlar va joylashuv.`,
+  }
+}
 
 export default async function DokonPage({
   params,
@@ -49,9 +67,7 @@ export default async function DokonPage({
     <div className="mx-auto max-w-3xl px-4 py-6">
       {/* Do'kon sahifasi ko'rilishini qayd qilamiz */}
       <KorishKuzat shopId={shop._id} tur="dokonKorish" />
-      <Link href="/" className="text-sm text-indigo-600 hover:underline">
-        ← Orqaga
-      </Link>
+      <OrqagaTugma />
 
       {/* Do'kon sarlavhasi */}
       <div className="mt-3 rounded-2xl border border-slate-200 bg-white p-4">
@@ -77,7 +93,7 @@ export default async function DokonPage({
             <KuzatilganLink
               shopId={shop._id}
               tur="telegram"
-              href={`https://t.me/${shop.telegram.replace('@', '')}`}
+              href={telegramHavola(shop.telegram)}
               target="_blank"
               rel="noreferrer"
               className="flex items-center gap-1 rounded-xl bg-sky-500 px-4 py-2 text-sm font-medium text-white hover:bg-sky-600"

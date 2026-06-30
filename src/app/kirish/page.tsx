@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import ParolMaydoni from '@/components/ParolMaydoni'
 
 export default function KirishPage() {
   const router = useRouter()
@@ -49,8 +50,14 @@ export default function KirishPage() {
           </p>
         )}
         <div>
-          <label className="mb-1 block text-sm font-medium">Telefon</label>
+          <label htmlFor="telefon" className="mb-1 block text-sm font-medium">
+            Telefon
+          </label>
           <input
+            id="telefon"
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
             value={telefon}
             onChange={(e) => setTelefon(e.target.value)}
             placeholder="901234567"
@@ -59,13 +66,14 @@ export default function KirishPage() {
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium">Parol</label>
-          <input
-            type="password"
+          <label htmlFor="parol" className="mb-1 block text-sm font-medium">
+            Parol
+          </label>
+          <ParolMaydoni
+            id="parol"
             value={parol}
-            onChange={(e) => setParol(e.target.value)}
-            placeholder="••••••"
-            className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 outline-none focus:border-indigo-400"
+            onChange={setParol}
+            autoComplete="current-password"
             required
           />
         </div>

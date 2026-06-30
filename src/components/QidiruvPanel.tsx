@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import PhoneCard from './PhoneCard'
 import type { QidiruvJavob } from '@/lib/types'
 
@@ -26,29 +27,45 @@ const SARALASH = [
 ]
 
 export default function QidiruvPanel() {
-  const [q, setQ] = useState('')
-  const [brend, setBrend] = useState('')
-  const [holati, setHolati] = useState('')
-  const [narxMin, setNarxMin] = useState('')
-  const [narxMax, setNarxMax] = useState('')
-  const [sort, setSort] = useState('yangi')
-  const [page, setPage] = useState(1)
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
+  // Boshlang'ich holatni URL'dan o'qiymiz (havola ulashilsa/orqaga qaytilsa saqlanadi)
+  const [q, setQ] = useState(() => searchParams.get('q') ?? '')
+  const [brend, setBrend] = useState(() => searchParams.get('brend') ?? '')
+  const [holati, setHolati] = useState(() => searchParams.get('holati') ?? '')
+  const [narxMin, setNarxMin] = useState(() => searchParams.get('narxMin') ?? '')
+  const [narxMax, setNarxMax] = useState(() => searchParams.get('narxMax') ?? '')
+  const [sort, setSort] = useState(() => searchParams.get('sort') ?? 'yangi')
+  const [page, setPage] = useState(() => Number(searchParams.get('page')) || 1)
 
   const [data, setData] = useState<QidiruvJavob | null>(null)
   const [yuklanmoqda, setYuklanmoqda] = useState(false)
 
-  const qidir = useCallback(async () => {
-    setYuklanmoqda(true)
+  const natijaRef = useRef<HTMLDivElement>(null)
+  const birinchiRef = useRef(true)
+
+  const filtrBor = Boolean(q || brend || holati || narxMin || narxMax)
+  const narxXato =
+    Boolean(narxMin && narxMax) && Number(narxMin) > Number(narxMax)
+
+  const joriyParams = useCallback(() => {
     const params = new URLSearchParams()
     if (q) params.set('q', q)
     if (brend) params.set('brend', brend)
     if (holati) params.set('holati', holati)
     if (narxMin) params.set('narxMin', narxMin)
     if (narxMax) params.set('narxMax', narxMax)
-    params.set('sort', sort)
-    params.set('page', String(page))
+    if (sort !== 'yangi') params.set('sort', sort)
+    if (page > 1) params.set('page', String(page))
+    return params
+  }, [q, brend, holati, narxMin, narxMax, sort, page])
+
+  const qidir = useCallback(async () => {
+    if (narxXato) return // noto'g'ri narx oralig'ida so'rov yubormaymiz
+    setYuklanmoqda(true)
     try {
-      const res = await fetch(`/api/listings?${params.toString()}`)
+      const res = await fetch(`/api/listings?${joriyParams().toString()}`)
       const json = await res.json()
       setData(json)
     } catch {
@@ -56,18 +73,40 @@ export default function QidiruvPanel() {
     } finally {
       setYuklanmoqda(false)
     }
-  }, [q, brend, holati, narxMin, narxMax, sort, page])
+  }, [joriyParams, narxXato])
 
   // Filtr o'zgarsa sahifani 1 ga qaytaramiz
   useEffect(() => {
     setPage(1)
   }, [q, brend, holati, narxMin, narxMax, sort])
 
-  // Qidiruvni debounce bilan ishga tushiramiz
+  // Qidiruvni debounce bilan ishga tushiramiz + URL'ni yangilaymiz
   useEffect(() => {
-    const t = setTimeout(qidir, 350)
+    const t = setTimeout(() => {
+      const qs = joriyParams().toString()
+      router.replace(qs ? `/?${qs}` : '/', { scroll: false })
+      qidir()
+    }, 350)
     return () => clearTimeout(t)
-  }, [qidir])
+  }, [qidir, joriyParams, router])
+
+  // Sahifa o'zgarganda natijalar tepasiga olib boramiz (birinchi yuklashdan tashqari)
+  useEffect(() => {
+    if (birinchiRef.current) {
+      birinchiRef.current = false
+      return
+    }
+    natijaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [page])
+
+  function tozala() {
+    setQ('')
+    setBrend('')
+    setHolati('')
+    setNarxMin('')
+    setNarxMax('')
+    setSort('yangi')
+  }
 
   return (
     <div className="relative z-10 mx-auto max-w-5xl px-4">
@@ -79,8 +118,18 @@ export default function QidiruvPanel() {
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Telefon nomini yozing... masalan: iPhone 15"
+            aria-label="Telefon qidirish"
             className="w-full bg-transparent py-3.5 text-sm outline-none"
           />
+          {q && (
+            <button
+              onClick={() => setQ('')}
+              aria-label="Qidiruvni tozalash"
+              className="text-slate-400 hover:text-slate-600"
+            >
+              ✕
+            </button>
+          )}
         </div>
 
         {/* Brend tezkor tugmalari */}
@@ -116,6 +165,7 @@ export default function QidiruvPanel() {
         <select
           value={holati}
           onChange={(e) => setHolati(e.target.value)}
+          aria-label="Holati bo'yicha filtr"
           className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
         >
           <option value="">Holati: barchasi</option>
@@ -127,18 +177,33 @@ export default function QidiruvPanel() {
           onChange={(e) => setNarxMin(e.target.value.replace(/\D/g, ''))}
           placeholder="Narx dan"
           inputMode="numeric"
-          className="w-28 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+          aria-label="Eng kam narx"
+          className={`w-28 rounded-lg border bg-white px-3 py-2 text-sm ${
+            narxXato ? 'border-red-300' : 'border-slate-200'
+          }`}
         />
         <input
           value={narxMax}
           onChange={(e) => setNarxMax(e.target.value.replace(/\D/g, ''))}
           placeholder="Narx gacha"
           inputMode="numeric"
-          className="w-28 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+          aria-label="Eng yuqori narx"
+          className={`w-28 rounded-lg border bg-white px-3 py-2 text-sm ${
+            narxXato ? 'border-red-300' : 'border-slate-200'
+          }`}
         />
+        {filtrBor && (
+          <button
+            onClick={tozala}
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-500 hover:bg-slate-50"
+          >
+            ✕ Tozalash
+          </button>
+        )}
         <select
           value={sort}
           onChange={(e) => setSort(e.target.value)}
+          aria-label="Saralash"
           className="ml-auto rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
         >
           {SARALASH.map((s) => (
@@ -149,10 +214,16 @@ export default function QidiruvPanel() {
         </select>
       </div>
 
+      {narxXato && (
+        <p className="mt-2 text-sm text-red-600">
+          &quot;Narx dan&quot; qiymati &quot;Narx gacha&quot;dan katta bo&apos;lmasligi kerak.
+        </p>
+      )}
+
       {/* Natijalar */}
-      <div className="mt-4">
+      <div ref={natijaRef} className="mt-4 scroll-mt-20">
         {data && (
-          <p className="mb-3 text-sm text-slate-500">
+          <p className="mb-3 text-sm text-slate-500" aria-live="polite">
             {yuklanmoqda ? 'Qidirilmoqda...' : `${data.jami} ta e'lon topildi`}
           </p>
         )}
@@ -160,7 +231,11 @@ export default function QidiruvPanel() {
         {yuklanmoqda && !data ? (
           <SkeletonGrid />
         ) : data && data.natijalar.length > 0 ? (
-          <div className="grid animate-fade-up grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          <div
+            className={`grid animate-fade-up grid-cols-2 gap-3 transition-opacity sm:grid-cols-3 lg:grid-cols-4 ${
+              yuklanmoqda ? 'pointer-events-none opacity-50' : ''
+            }`}
+          >
             {data.natijalar.map((l) => (
               <PhoneCard key={l._id} listing={l} />
             ))}
@@ -170,6 +245,14 @@ export default function QidiruvPanel() {
             <p className="text-4xl">🔍</p>
             <p className="mt-2">Hech narsa topilmadi</p>
             <p className="text-sm">Boshqa nom yoki filtr bilan urinib ko&apos;ring</p>
+            {filtrBor && (
+              <button
+                onClick={tozala}
+                className="mt-4 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-indigo-600 hover:bg-slate-50"
+              >
+                Filtrlarni tozalash
+              </button>
+            )}
           </div>
         )}
 

@@ -15,7 +15,9 @@ export default function PhoneCard({ listing }: { listing: ListingNatija }) {
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={rasm}
-            alt={listing.model}
+            alt={`${listing.brend} ${listing.model}`}
+            loading="lazy"
+            decoding="async"
             className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
           />
         ) : (
